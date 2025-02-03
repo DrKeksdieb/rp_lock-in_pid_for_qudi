@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Tue Sep 12 10:33:55 2017
+
+@author: lolo
+"""
 
 from numpy import *
-import time
 try:
     import matplotlib.pyplot as plt
 except:
     print('No PLT')
+
 
 import os
 from time import sleep
@@ -15,9 +20,9 @@ from datetime import datetime
 import subprocess
 import platform
 import paramiko
+# conda install -c anaconda paramiko
 import getpass
 import socket
-import netifaces
 
 import requests
 import bs4
@@ -27,6 +32,8 @@ import bs4
 # For read_dump
 import glob
 import struct
+import struct
+
 
 BLUE='\033[34m'
 RED='\033[31m'
@@ -604,11 +611,10 @@ class red_pitaya_app():
         result = self.ssh_cmd('uname -a')
         self.info['RP kernel'] = result.strip()
         myIP, myPort, rpIP, rpPort = self.ssh_cmd('echo $SSH_CONNECTION').strip().split(' ')
-        self.resolve_dns()
-        self.info['rpIP']   = self.ip
-        self.info['rpPort'] = rpPort
-        self.info['myIP'] = self.get_local_ipv4(self.info['rpIP'])
+        self.info['myIP']   = myIP
         self.info['myPort'] = myPort
+        self.info['rpIP']   = rpIP
+        self.info['rpPort'] = rpPort
         if self.connected:
             return True
         else:
@@ -617,10 +623,9 @@ class red_pitaya_app():
         result = self.ssh_cmd('uname -a')
         self.info['RP kernel'] = result.strip()
         myIP, myPort, rpIP, rpPort = self.ssh_cmd('echo $SSH_CONNECTION').strip().split(' ')
-        self.info['myIP']   = self.get_local_ipv4(self.info['rpIP'])
+        self.info['myIP']   = myIP
         self.info['myPort'] = myPort
-        self.resolve_dns()
-        self.info['rpIP']   = self.ip
+        self.info['rpIP']   = rpIP
         self.info['rpPort'] = rpPort
 
     def __repr__(self):
@@ -977,28 +982,16 @@ class red_pitaya_app():
         self.log('start_streaming():'+log)
 
         self.file   = open(fn,'a')
-        self.stream = subprocess.Popen( 'ncat -l 6000'.split(' ') , shell=False , stdin=subprocess.PIPE , stdout=self.file , stderr=subprocess.PIPE)
+        self.stream = subprocess.Popen( 'nc -l 6000'.split(' ') , shell=False , stdin=subprocess.PIPE , stdout=self.file , stderr=subprocess.PIPE)
         #subprocess.Popen('nc -d -l 6000 > '+name, shell=True)
         #cmd='/root/py/data_dump.py -s '+ip+' -p 6000 --params '+' '.join(signals)
 
-        # to make sure the listener is ready
-        # time.sleep(5)
-
-        # get ip
-        print("rp_ip:",self.ip)
-        local_ip = self.get_local_ipv4(str(self.ip))
-        print("local_ip: ", local_ip, "\n")
-
         cmd ='/opt/redpitaya/www/apps/'+ self.AppName +'/py/data_dump.py '
-        cmd+=' -s '+ local_ip + ' -p 6000 '
+        cmd+=' -s '+ self.info['myIP'] + ' -p 6000 '
         cmd+='--params ' + ' '.join(signals)
 
-        print("cmd: ",cmd,"\n")
-
-        del local_ip
-
         self.log('start_streaming(): filename='+fn)
-        # print(fn)
+        print(fn)
         self.log('remote: '+cmd)
         self.remote  = self.ssh.exec_command(cmd)
         #sleep(2)
@@ -1028,26 +1021,6 @@ class red_pitaya_app():
             self.stream.communicate()
             self.file.close()
             self.stream=False
-
-    def get_local_ipv4(self,remote_ip):
-        """
-        Automatically detect the correct local IPv4 address for communicating with a remote device.
-
-        Args:
-            remote_ip (str): The IPv4 address of the remote device (e.g., Red Pitaya).
-
-        Returns:
-            str: The detected local IPv4 address.
-        """
-        try:
-            # Create a temporary socket to determine the local IP
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                s.connect((remote_ip, 1))  # Port 1 is arbitrary; no actual connection is made
-                local_ip = s.getsockname()[0]  # Get the local IP address
-            return local_ip
-        except Exception as e:
-            print(f"Error detecting local IPv4 address: {e}")
-            return None
 
     def fire_trig(self,trig_src,trig_pos=None,dec=None,hys=None,threshold=None,timeout=10):
         """
