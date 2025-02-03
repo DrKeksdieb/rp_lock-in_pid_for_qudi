@@ -14,6 +14,7 @@ lock_in+pid/fpga/.srcs/
 archive/
 lock_in+pid/fpga/.Xil
 lock_in+pid/fpga/sdk
+.idea
 
 # Compiled source #
 ###################
