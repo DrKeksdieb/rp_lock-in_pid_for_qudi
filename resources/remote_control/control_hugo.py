@@ -614,6 +614,7 @@ class red_pitaya_app():
         self.resolve_dns()
         self.info['rpIP']   = self.ip
         self.info['rpPort'] = rpPort
+        self.resolve_dns()
         self.info['myIP'] = self.get_local_ipv4(self.info['rpIP'])
         self.info['myPort'] = myPort
         if self.connected:
@@ -624,6 +625,7 @@ class red_pitaya_app():
         result = self.ssh_cmd('uname -a')
         self.info['RP kernel'] = result.strip()
         myIP, myPort, rpIP, rpPort = self.ssh_cmd('echo $SSH_CONNECTION').strip().split(' ')
+        self.resolve_dns()
         self.info['myIP']   = self.get_local_ipv4(self.info['rpIP'])
         self.info['myPort'] = myPort
         self.resolve_dns()
