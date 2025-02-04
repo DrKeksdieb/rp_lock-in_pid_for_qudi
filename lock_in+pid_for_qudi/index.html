@@ -47,7 +47,7 @@
   //var root_url = 'http://192.168.53.133';  // Test remote and local
   //var root_url = 'http://192.168.1.100';   // Default RedPitaya IP
 
-  var app_version = 'VERSION';
+  var app_version = '0.2.1-1-devbuild';
   var start_app_url = root_url + '/bazaar?start=' + app_id;
   var stop_app_url = root_url + '/bazaar?stop=';
   var get_url = root_url + '/data';
@@ -4186,7 +4186,7 @@
     var dd = dd || new Date().toJSON() ;
     var date = new Date(dd);
     var date_str= ('0'+date.getFullYear()).substr(-4,4)+
-                  ('0'+(date.getMonth()+1) ).substr(-2,2)+
+                  ('0'+date.getMonth()+1 ).substr(-2,2)+
                   ('0'+date.getDate()    ).substr(-2,2)+
                   '_'+
                   ('0'+date.getHours()   ).substr(-2,2)+
