@@ -1,5 +1,12 @@
 # Red Pitaya Lock-in+PID Application
 
+## Disclaimer
+
+1. I don't know what I'm doing. 
+2. I just try to make this work. 
+3. I'm not responsible for anything this fucks up. 
+4. No, I can't help with any problems you are encountering (see point nr. 1)
+
 ## Lock-in and PID application for RedPitaya enviroment
 
 This is an application build for the [Red Pitaya STEMlab 125-14](https://www.redpitaya.com/) board (RP).
