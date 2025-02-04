@@ -15,6 +15,7 @@ archive/
 lock_in+pid/fpga/.Xil
 lock_in+pid/fpga/sdk
 .idea
+resources/remote_control/2025*dump.bin
 
 # Compiled source #
 ###################
