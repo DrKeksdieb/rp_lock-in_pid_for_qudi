@@ -1033,7 +1033,7 @@ class red_pitaya_app():
             result = self.ssh_cmd(cmd)
             for i in [ y.strip().split(' ')[0] for y in filter(lambda x: 'data_dump.py' in x, result.split('\n'))  ]:
                 self.ssh_cmd('kill '+str(i))
-                self.log('stop_straming(): killing pid: '+str(i))
+                self.log('stop_streaming(): killing pid: '+str(i))
             self.stream.terminate()
             self.stream.communicate()
             self.file.close()

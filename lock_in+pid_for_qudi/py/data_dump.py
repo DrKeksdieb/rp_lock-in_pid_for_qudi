@@ -9,10 +9,9 @@ import mmap
 import sys
 import struct
 import subprocess
+import socket
 
 import argparse
-
-
 
 
 # Some config vars
@@ -55,8 +54,13 @@ parser.add_argument('--params', nargs='+')
 
 args = parser.parse_args()
 
-nc_cmd = ['nc '+args.server+' '+args.port]
+# nc_cmd = ['nc '+args.server+' '+args.port]
 
+# Create socket and connect to the PC
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print(args.server)
+sock.connect((args.server, int(args.port)))
+print("connected")
 
 if __name__ == '__main__':
     # Function for nice kill
@@ -91,7 +95,7 @@ if __name__ == '__main__':
     ss=struct.Struct(struct_str)
     
     # NetCat proccess to send data to server
-    process = subprocess.Popen(nc_cmd, shell=True, stdin=subprocess.PIPE,stdout=subprocess.PIPE,preexec_fn = preexec_function)
+    # process = subprocess.Popen(nc_cmd, shell=True, stdin=subprocess.PIPE,stdout=subprocess.PIPE,preexec_fn = preexec_function)
     
     # txt=(('Columns: '+','.join(args.params)+'\n'+'timestamp {:>20f}\n'.format(t0)).ljust(99)+'\n').encode('ascii')
     #
@@ -120,8 +124,9 @@ if __name__ == '__main__':
                       C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
                   #sys.stdout.buffer.write( ss.pack(time()-t0, *C )  )
                   li.unfreeze()
-                  process.stdin.write( ss.pack(time()-t0, *C ) )
-                  process.stdin.flush()
+                  packed_data = ss.pack(time()-t0, *C )
+                  sock.sendall(packed_data)
+                  print(packed_data)
               sleep(Dtime2)
               if killer.kill_now:
                   break
@@ -133,8 +138,9 @@ if __name__ == '__main__':
                       C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
                   #sys.stdout.buffer.write( ss.pack(time()-t0, *C )  )
                   li.unfreeze()
-                  process.stdin.write( ss.pack(time()-t0, *C ) )
-                  process.stdin.flush()
+                  packed_data = ss.pack(time()-t0, *C )
+                  sock.sendall(packed_data)
+                  print(packed_data)
               sleep(Dtime2)
               if (time()-tl>args.timeout):
                   break
