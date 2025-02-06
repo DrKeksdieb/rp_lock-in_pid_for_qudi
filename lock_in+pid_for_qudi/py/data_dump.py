@@ -94,25 +94,10 @@ if __name__ == '__main__':
         C.append(0)
     ss=struct.Struct(struct_str)
     
-    # NetCat proccess to send data to server
-    # process = subprocess.Popen(nc_cmd, shell=True, stdin=subprocess.PIPE,stdout=subprocess.PIPE,preexec_fn = preexec_function)
-    
-    # txt=(('Columns: '+','.join(args.params)+'\n'+'timestamp {:>20f}\n'.format(t0)).ljust(99)+'\n').encode('ascii')
-    #
-    # process.stdin.write(txt)
-    # process.stdin.flush()
-    
     # Open memory
     with open("/dev/mem", "r+b") as f:
       mm = mmap.mmap(f.fileno(), 512, offset=0x40600000)
-      
-      # txt2=[]
-      # for i in li:
-      #     addr=i.addr
-      #     A=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
-      #     txt2.append( '"{:s}": {:f}'.format(i.name,A) )
-      # process.stdin.write( (  ('params={'+',\n'.join(txt2) +'\n}\n').ljust(3399)+'\n' ).encode('ascii') )
-      # process.stdin.flush()
+
       li.start_clk()
       print(t0)
       tl=time()
@@ -122,11 +107,10 @@ if __name__ == '__main__':
                   li.freeze()
                   for i,addr in enumerate(memcodes):
                       C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
-                  #sys.stdout.buffer.write( ss.pack(time()-t0, *C )  )
                   li.unfreeze()
                   packed_data = ss.pack(time()-t0, *C )
                   sock.sendall(packed_data)
-                  print(packed_data)
+                  print("time: " + str(time()-t0) + " data:"+str(packed_data))
               sleep(Dtime2)
               if killer.kill_now:
                   break
@@ -136,11 +120,10 @@ if __name__ == '__main__':
                   li.freeze()
                   for i,addr in enumerate(memcodes):
                       C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
-                  #sys.stdout.buffer.write( ss.pack(time()-t0, *C )  )
                   li.unfreeze()
                   packed_data = ss.pack(time()-t0, *C )
                   sock.sendall(packed_data)
-                  print(packed_data)
+                  print("time: " + str(time()-t0) + " data:"+str(packed_data))
               sleep(Dtime2)
               if (time()-tl>args.timeout):
                   break
