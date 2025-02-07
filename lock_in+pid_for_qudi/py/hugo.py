@@ -5,7 +5,8 @@ Module for lock-in+pid control
 """
 
 
-from time import sleep
+# from time import sleep
+import time
 import mmap
 import sys
 
@@ -149,18 +150,22 @@ class fpga_osc(fpga_regs):
             for i in range(2**14):
                 C=int.from_bytes(mem.read(4), byteorder='little', signed=False)
                 self.chA[i]= ( -1 * ( (C^16383) +1 )  ) if (C & 0x2000 ) else C
-            mem.close()
+            # mem.close()
             # Get ChB
-            mem = mmap.mmap(ff.fileno(), mmap.PAGESIZE*1024*32, offset=0x40120000)
+            mem.seek(0x40120000 - 0x40110000)  # Move the pointer to the ChB section
+            # mem = mmap.mmap(ff.fileno(), mmap.PAGESIZE*1024*32, offset=0x40120000)
             for i in range(2**14):
                 C=int.from_bytes(mem.read(4), byteorder='little', signed=False)
                 self.chB[i]= ( -1 * ( (C^16383) +1 )  ) if (C & 0x2000 ) else C
             mem.close()
-            self.chA = self.chA[self.ptr:16384] + self.chA[0:self.ptr]
-            self.chB = self.chB[self.ptr:16384] + self.chB[0:self.ptr]
+
+        # Wraparound (why is this here?)
+        self.chA = self.chA[self.ptr:16384] + self.chA[0:self.ptr]
+        self.chB = self.chB[self.ptr:16384] + self.chB[0:self.ptr]
+
         return True
 
-    def get_curves(self,binary=False):
+    def get_curves(self,binary=False,qudi_format=False):
         self.get_chs()
         out=[]
         if binary:
@@ -168,6 +173,11 @@ class fpga_osc(fpga_regs):
             for i in range(16*1024):
                 ss=struct.Struct('!hh')
                 out+=ss.pack(self.chA[i],self.chB[i])
+        elif qudi_format:
+            out = bytearray()
+            ss = struct.Struct('!hh')
+            for i in range(16*1024):
+                out.extend(ss.pack(self.chA[i], self.chB[i]))
         else:
             for i in range(16*1024):
                 out.append("{:05d},{:5d},{:5d}".format(i,self.chA[i],self.chB[i]))
