@@ -95,40 +95,44 @@ if __name__ == '__main__':
     ss=struct.Struct(struct_str)
     
     # Open memory
-    with open("/dev/mem", "r+b") as f:
-      mm = mmap.mmap(f.fileno(), 512, offset=0x40600000)
+    # with open("/dev/mem", "r+b") as f:
+    #   mm = mmap.mmap(f.fileno(), 512, offset=0x40600000)
 
-      li.start_clk()
-      print(t0)
-      tl=time()
-      if args.timeout <= 0:
-          while True:
-              if (time()-tl>Dtime):
-                  li.freeze()
-                  for i,addr in enumerate(memcodes):
-                      C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
-                  li.unfreeze()
-                  packed_data = ss.pack(time()-t0, *C )
-                  sock.sendall(packed_data)
-                  print("time: " + str(time()-t0) + " data:"+str(packed_data))
-              sleep(Dtime2)
-              if killer.kill_now:
-                  break
-      else:
-          while True:
-              if (time()-tl>Dtime):
-                  li.freeze()
-                  for i,addr in enumerate(memcodes):
-                      C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
-                  li.unfreeze()
-                  packed_data = ss.pack(time()-t0, *C )
-                  sock.sendall(packed_data)
-                  print("time: " + str(time()-t0) + " data:"+str(packed_data))
-              sleep(Dtime2)
-              if (time()-tl>args.timeout):
-                  break
-              if killer.kill_now:
-                  break            
+    li.start_clk()
+    # print(t0)
+    tl=time()
+    if args.timeout <= 0:
+        while True:
+            if (time()-tl>Dtime):
+                # li.freeze()
+                # for i,addr in enumerate(memcodes):
+                #     C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
+
+                C = osc.get_curves(qudi_format=True)
+                # li.unfreeze()
+                # packed_data = ss.pack(time()-t0, *C )
+                # sock.sendall(packed_data)
+                sock.sendall(C)
+                # print("time: " + str(time()-t0) + " data:"+str(packed_data))
+                print("time: " + "{:.6f}".format(time() - t0) + " 65536 bytes sent!")
+                # sleep(Dtime2)
+            if killer.kill_now:
+                break
+    else:
+        while True:
+            if (time()-tl>Dtime):
+                li.freeze()
+                for i,addr in enumerate(memcodes):
+                    C[i]=int.from_bytes(mm[addr:addr+4], byteorder='little', signed=True)
+                li.unfreeze()
+                packed_data = ss.pack(time()-t0, *C )
+                sock.sendall(packed_data)
+                print("time: " + str(time()-t0) + " data:"+str(packed_data))
+            sleep(Dtime2)
+            if (time()-tl>args.timeout):
+                break
+            if killer.kill_now:
+                break
     # End code
     
     print("Program finished")
