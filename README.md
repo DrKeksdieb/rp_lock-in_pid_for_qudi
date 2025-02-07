@@ -3,7 +3,8 @@
 ## Disclaimer
 
 1. I don't know what I'm doing. 
-2. I just try to make this work. 
+2. I just try to make this s*it work. 
+3. I'm aware this is severely botched, and will propably never work.
 3. I'm not responsible for anything this fucks up. 
 4. No, I can't help with any problems you are encountering (see point nr. 1)
 
