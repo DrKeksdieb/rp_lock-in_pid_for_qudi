@@ -2,6 +2,8 @@
 
 ## Disclaimer
 
+I am no longer working on this, and the current state is non-functional.
+
 1. I don't know what I'm doing. 
 2. I just try to make this s*it work. 
 3. I'm aware this is severely botched, and will propably never work.
